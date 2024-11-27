@@ -1,0 +1,2 @@
+a_faiss_index.bin filter=lfs diff=lfs merge=lfs -text
+*.bin filter=lfs diff=lfs merge=lfs -text
