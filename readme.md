@@ -47,7 +47,7 @@ You can interact with the tool in two ways:
 ### 1. Interactive Mode
 Run the script without a query.txt file:
 ```bash
-python app.py --llm-provider openai --top-k 3
+python app.py 
 ```
 This will start an interactive session where you can type queries and receive responses in real-time.
 
