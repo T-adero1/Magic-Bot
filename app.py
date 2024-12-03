@@ -340,6 +340,10 @@ def main():
     chunks_dir = os.path.join(current_dir, 'chunks')
     embeddings_dir = os.path.join(current_dir, 'embeddings')
 
+    # Find query.txt in the root directory
+    query_file = os.path.join(current_dir, 'query.txt')
+    txt_file = os.path.exists(query_file)  # Set flag based on existence of query.txt
+
     parser.add_argument('--embeddings_dir', type=str, default=embeddings_dir,
                         help='Directory containing embeddings and index files (default: ./embeddings)')
     parser.add_argument('--chunks_dir', type=str, default=chunks_dir,
@@ -352,8 +356,6 @@ def main():
 
     # Initialize the search
     searcher = SearchEmbeddings(model_name=args.model_name)
-
-    # Load the embeddings and reconstruct chunks mappings
     searcher.load_embeddings(args.embeddings_dir, chunks_dir=args.chunks_dir)
 
     # Verify data loading
@@ -366,7 +368,32 @@ def main():
         print("❌ No data loaded. Ensure the embeddings and chunks mapping are correctly set up.")
         return
 
-    # Loop to allow multiple queries
+    if txt_file:  # Now checks if query.txt exists
+        try:
+            with open(query_file, 'r', encoding='utf-8') as f:
+                query = f.read().strip()
+            print(f"\n📥 Received query from query.txt:\n{query}")
+            
+            answer, similar_chunks = searcher.answer_query_with_context(query, k=args.top_k)
+            print("\n✅ Generated response from context.")
+            print("\n=== ✨ Answer ===")
+            print(answer)
+            print("\n=== 📝 Source Details ===")
+            for i, chunk in enumerate(similar_chunks, 1):
+                github_link = searcher.get_github_link(chunk['source_file'])
+                print(f"\nChunk {i}:")
+                print(f"  Index: {chunk['index']}")
+                print(f"  Source File: {chunk['source_file']}")
+                print(f"  File: {chunk['file']}")
+                print(f"  Chunk Number: {chunk['chunk_number']}")
+                print(f"  GitHub Link: {github_link}")
+                print("-" * 40)
+            return
+        except Exception as e:
+            print(f"\n❌ Error reading query file: {e}")
+            return
+
+    # Original interactive loop continues here if no txt file found
     while True:
         print("\n=== 🛠 Magic Chatbot Query Interface ===")
         query = input("\nEnter your search query (or type 'exit' to quit): ").strip()
