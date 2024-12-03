@@ -11,6 +11,9 @@ import ollama  # Import ollama
 import argparse
 from openai import OpenAI
 from groq import Groq
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # LLM Provider flag - options: 'ollama', 'openai', 'groq'
 LLM_PROVIDER = 'openai'
